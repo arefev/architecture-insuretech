@@ -6,4 +6,18 @@
 
 ## Задание 2. Динамическое масштабирование контейнеров
 
-[]()
+### Часть 1
+
+[Состояние подов перед нагрузкой](./Task2/screenshots/memory/hpa-memory-before.png)
+
+[Состояние подов после нагрузки](./Task2/screenshots/memory/hpa-memory-after.png)
+
+[Настройки скалирования](./Task2/screenshots/memory/hpa-memory-describe.png)
+
+### Часть 2
+
+[Состояние подов перед нагрузкой](./Task2/screenshots/rps/hpa-rps-pods-before.png)
+
+[Состояние подов после нагрузки](./Task2/screenshots/rps/hpa-rps-pods-after.png)
+
+[Настройки скалирования](./Task2/screenshots/rps/hpa-rps-describe.png)

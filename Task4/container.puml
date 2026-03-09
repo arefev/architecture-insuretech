@@ -1,0 +1,75 @@
+@startuml InsureTechContainer
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title InsureTech - Container Diagram (Event Driven Architecture + ОСАГО)
+
+Person(customer, "Customer", "Пользователь веб-приложения")
+Person(partner, "Partner System", "B2B партнёры")
+
+System_Boundary(insuretech, "InsureTech Platform") {
+
+    Container(webapp, "Web Application", "React / SPA", "Подача заявки на ОСАГО, отображение предложений в реальном времени")
+
+    Container(core_app, "core-app", "Java / Spring Boot", "Основная бизнес-логика оформления страховок, оркестрация ОСАГО")
+
+    Container(client_info, "client-info", "Java / Spring Boot", "Сервис управления клиентскими данными")
+
+    Container(product_aggregator, "ins-product-aggregator", "Java / Spring Boot", "Агрегирует продукты страховых компаний (жизнь, другие страхования)")
+
+    Container(osago_agg, "osago-aggregator", "Java / Spring Boot", "Отправляет заявки ОСАГО в страховые компании, опрашивает их, публикует результаты; включает Circuit Breaker, Timeout, Retry")
+
+    Container(settlement, "ins-comp-settlement", "Java / Spring Boot", "Взаиморасчёты со страховыми компаниями")
+
+    Container(kafka, "Event Streaming Platform", "Apache Kafka", "Обмен событиями между сервисами")
+
+    ContainerDb(core_db, "Core DB", "PostgreSQL", "База данных core-app")
+
+    ContainerDb(client_db, "Client DB", "PostgreSQL", "База данных клиентов")
+
+    ContainerDb(product_db, "Product DB", "PostgreSQL", "Кэш продуктов страховых компаний")
+
+    ContainerDb(osago_db, "OSAGO DB", "PostgreSQL", "Хранение статуса заявок ОСАГО и результатов от страховых компаний")
+
+    ContainerDb(settlement_db, "Settlement DB", "PostgreSQL", "База взаиморасчетов")
+}
+
+System_Ext(ins_companies, "Insurance Companies", "Страховые компании (OSAGO endpoints)")
+
+Rel(customer, webapp, "Оформление ОСАГО", "HTTPS")
+
+Rel(partner, core_app, "REST API", "HTTPS")
+
+Rel(webapp, core_app, "REST / WebSocket API (streaming offers)", "Отправка заявки; получение предложений в real-time")
+
+Rel(core_app, client_info, "REST: данные клиента")
+
+Rel(product_aggregator, ins_companies, "REST: продукты и тарифы")
+
+Rel(product_aggregator, kafka, "Publishes ProductUpdated")
+
+Rel(kafka, core_app, "Consumes ProductUpdated")
+
+Rel(kafka, settlement, "Consumes ProductUpdated")
+
+Rel(core_app, kafka, "Publishes InsuranceCreated")
+
+Rel(kafka, settlement, "Consumes InsuranceCreated")
+
+' ОСАГО интеграция
+Rel(core_app, osago_agg, "Command API: createOSAGORequest(), subscribeForOffers()", "REST or gRPC (with Retry, Timeout, Circuit Breaker)")
+
+Rel(osago_agg, osago_db, "Read/Write OSAGO requests")
+
+Rel(osago_agg, ins_companies, "REST: create OSAGO request + polling offers", "With Timeout=60s, Retry, Circuit Breaker, Rate Limiting")
+
+Rel(osago_agg, kafka, "Publishes OSAGOCarrierOfferReady")
+
+Rel(kafka, core_app, "Consumes OSAGOCarrierOfferReady (async updates)")
+
+' Core DBs
+Rel(core_app, core_db, "Read/Write")
+Rel(client_info, client_db, "Read/Write")
+Rel(product_aggregator, product_db, "Read/Write")
+Rel(settlement, settlement_db, "Read/Write")
+
+@enduml

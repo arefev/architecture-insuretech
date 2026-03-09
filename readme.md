@@ -27,3 +27,7 @@
 [Решение](./Task3/ed.md)
 
 [Контейнерная диаграмма](./Task3/InsureTechContainer.png)
+
+## Задание 4. Проектирование продажи ОСАГО
+
+[Контейнерная диаграмма](./Task4/InsureTechContainer.png)

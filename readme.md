@@ -35,3 +35,7 @@
 ## Задание 5. Проектирование GraphQL API
 
 [GraphQL API](./Task5/schema.graphql)
+
+## Задание 6. Настройка Rate Limiting
+
+[Rate Limiting](./Task6/nginx.conf)

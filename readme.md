@@ -31,3 +31,7 @@
 ## Задание 4. Проектирование продажи ОСАГО
 
 [Контейнерная диаграмма](./Task4/InsureTechContainer.png)
+
+## Задание 5. Проектирование GraphQL API
+
+[GraphQL API](./Task5/schema.graphql)

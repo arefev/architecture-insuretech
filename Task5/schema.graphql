@@ -1,0 +1,40 @@
+schema {
+  query: Query
+}
+
+# --- Root Queries ---
+type Query {
+  # Главный запрос для получения всех клиентских данных
+  client(id: ID!): Client
+
+  # Отдельные выборки при необходимости (аналог REST)
+  clientDocuments(id: ID!): [Document]
+  clientRelatives(id: ID!): [Relative]
+}
+
+# --- Main Entities ---
+
+type Client {
+  id: ID!
+  name: String
+  age: Int
+
+  # Вложенные данные (как в расширенной карточке клиента)
+  documents: [Document]
+  relatives: [Relative]
+}
+
+type Document {
+  id: ID!
+  type: String
+  number: String
+  issueDate: String
+  expiryDate: String
+}
+
+type Relative {
+  id: ID!
+  relationType: String
+  name: String
+  age: Int
+}

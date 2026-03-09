@@ -1,0 +1,57 @@
+@startuml InsureTechContainer
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title InsureTech - Container Diagram (Event Driven Architecture)
+
+Person(customer, "Customer", "Пользователь веб-приложения")
+Person(partner, "Partner System", "B2B партнёры")
+
+System_Boundary(insuretech, "InsureTech Platform") {
+
+    Container(webapp, "Web Application", "React / SPA", "Веб-интерфейс для клиентов")
+
+    Container(core_app, "core-app", "Java / Spring Boot", "Основная бизнес-логика оформления страховок")
+
+    Container(client_info, "client-info", "Java / Spring Boot", "Сервис управления клиентскими данными")
+
+    Container(product_aggregator, "ins-product-aggregator", "Java / Spring Boot", "Агрегирует предложения страховых компаний")
+
+    Container(settlement, "ins-comp-settlement", "Java / Spring Boot", "Сервис взаиморасчётов со страховыми компаниями")
+
+    Container(kafka, "Event Streaming Platform", "Apache Kafka", "Шина событий")
+
+    ContainerDb(core_db, "Core DB", "PostgreSQL", "База данных core-app")
+
+    ContainerDb(client_db, "Client DB", "PostgreSQL", "База данных клиентов")
+
+    ContainerDb(product_db, "Product DB", "PostgreSQL", "Кэш продуктов страховых компаний")
+
+    ContainerDb(settlement_db, "Settlement DB", "PostgreSQL", "База взаиморасчетов")
+
+}
+
+System_Ext(ins_companies, "Insurance Companies", "Страховые компании")
+
+Rel(customer, webapp, "Использует", "HTTPS")
+Rel(webapp, core_app, "REST API", "HTTPS")
+Rel(partner, core_app, "REST API", "HTTPS")
+
+Rel(core_app, client_info, "Получает данные клиента", "REST")
+
+Rel(product_aggregator, ins_companies, "Получает продукты и тарифы", "REST API")
+
+Rel(product_aggregator, kafka, "Publishes ProductUpdated event", "Kafka")
+
+Rel(kafka, core_app, "Consumes ProductUpdated event")
+
+Rel(kafka, settlement, "Consumes ProductUpdated event")
+
+Rel(core_app, kafka, "Publishes InsuranceCreated event")
+
+Rel(kafka, settlement, "Consumes InsuranceCreated event")
+
+Rel(core_app, core_db, "Read/Write")
+Rel(client_info, client_db, "Read/Write")
+Rel(product_aggregator, product_db, "Read/Write")
+Rel(settlement, settlement_db, "Read/Write")
+@enduml

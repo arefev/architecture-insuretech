@@ -21,3 +21,9 @@
 [Состояние подов после нагрузки](./Task2/screenshots/rps/hpa-rps-pods-after.png)
 
 [Настройки скалирования](./Task2/screenshots/rps/hpa-rps-describe.png)
+
+## Задание 3. Переход на Event-Driven архитектуру
+
+[Решение](./Task3/ed.md)
+
+[Контейнерная диаграмма](./Task3/InsureTechContainer.png)
